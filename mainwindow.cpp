@@ -99,6 +99,7 @@ void MainWindow::CalcMoon(QDate selected)
 
     while (!textlist.isEmpty())
         scene->removeItem(textlist.takeFirst());
+    scene->update();
     textlist.clear();
 
 
