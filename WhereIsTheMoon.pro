@@ -257,3 +257,6 @@ HEADERS  += mainwindow.h \
     options.h
 
 FORMS    += mainwindow.ui
+
+DISTFILES += \
+    README.md
