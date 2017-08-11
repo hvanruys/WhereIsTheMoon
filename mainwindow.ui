@@ -77,6 +77,20 @@
          <widget class="QComboBox" name="cmbGeoSat"/>
         </item>
         <item>
+         <widget class="QRadioButton" name="rdb10min">
+          <property name="text">
+           <string>Every 10 minutes</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="rdb15min">
+          <property name="text">
+           <string>Every 15 minutes</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <spacer name="verticalSpacer">
           <property name="orientation">
            <enum>Qt::Vertical</enum>

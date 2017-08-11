@@ -35,6 +35,10 @@ private slots:
 
     void on_cmbGeoSat_currentIndexChanged(int index);
 
+    void on_rdb10min_clicked();
+
+    void on_rdb15min_clicked();
+
 private:
     Ui::MainWindow *ui;
     GridScene *scene;

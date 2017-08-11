@@ -50,6 +50,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
      SetupCombo();
      ui->cmbGeoSat->setCurrentIndex(opts.geosatindex);
+     ui->rdb10min->setChecked(true);
 
      //QString strlon = opts.geostationarylistlon.at(ui->cmbGeoSat->currentIndex());
 
@@ -84,6 +85,12 @@ void MainWindow::CalcMoon(QDate selected)
 {
     double hours, minutes;
     int day, year, month;
+    int min;
+
+    if(ui->rdb10min->isChecked())
+        min = 10;
+    else
+        min = 15;
 
     year = selected.year();
     month = selected.month();
@@ -102,14 +109,13 @@ void MainWindow::CalcMoon(QDate selected)
     scene->update();
     textlist.clear();
 
-
     qDebug() << QString("Calculating for satellite at %1°").arg(geolonlist.at(geosatindex));
 
     ui->listWidget->clear();
 
     for( int hours = 0; hours < 24; hours++)
     {
-        for( int minutes = 0; minutes < 60; minutes += 10)
+        for( int minutes = 0; minutes < 60; minutes += min)
         {
             double dday =  static_cast<double>(day) + static_cast<double>(hours)/24.0 + static_cast<double>(minutes)/(24.0*60.0);
             double JD = CAADate::DateToJD(year, month, dday, true);
@@ -239,4 +245,15 @@ void MainWindow::on_cmbGeoSat_currentIndexChanged(int index)
 {
     geosatindex = index;
     qDebug() << "on_cmbGeoSat geolastsat = " << index;
+}
+
+void MainWindow::on_rdb10min_clicked()
+{
+    this->CalcMoon(ui->calendarWidget->selectedDate());
+}
+
+void MainWindow::on_rdb15min_clicked()
+{
+    this->CalcMoon(ui->calendarWidget->selectedDate());
+
 }
