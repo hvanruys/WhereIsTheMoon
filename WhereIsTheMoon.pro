@@ -144,6 +144,7 @@ SOURCES += main.cpp\
 HEADERS  += mainwindow.h \
     AA+.h \
     AAELP2000.h \
+    AANearParabolic.h \
     gridscene.h \
     graphicsviewzoom.h \
   AA2DCoordinate.h \
