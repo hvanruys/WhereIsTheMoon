@@ -1,12 +1,22 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "AA+.h"
+#include "aaplus/AA+.h"
 #include <cstdio>
 #include <cmath>
 #include <QDebug>
 #include "options.h"
 
 extern Options opts;
+
+static inline double MapToMinus180To180Range(double Degrees)
+  {
+    double fResult = CAACoordinateTransformation::MapTo0To360Range(Degrees);
+
+    if (fResult > 180)
+      fResult = fResult - 360;
+
+    return fResult;
+  }
 
 void HoursTohms(double inhours, int &hours, int &minutes, int &seconds)
 {
@@ -59,7 +69,7 @@ MainWindow::MainWindow(QWidget *parent) :
      {
          // For AA+ longitudes West are positive, hence 180.0 - lon;
          //qDebug() << QString("name = %1").arg(*itsname);
-         double opposietlong = CAACoordinateTransformation::MapToMinus180To180Range(180 - (*itslon).toFloat());
+         double opposietlong = MapToMinus180To180Range(180 - (*itslon).toFloat());
          qDebug() << "lon = " << (*itslon) << " opposietlong = " << opposietlong;
          geolonlist << opposietlong;
          ++itslon;
@@ -147,7 +157,7 @@ void MainWindow::CalcMoon(QDate selected)
 
             double diffangle = 20.0;
 
-            double HourAngleDegrees = CAACoordinateTransformation::MapToMinus180To180Range(CAACoordinateTransformation::HoursToDegrees(LHA));
+            double HourAngleDegrees = MapToMinus180To180Range(CAACoordinateTransformation::HoursToDegrees(LHA));
             double DecLHA = sqrt(HourAngleDegrees * HourAngleDegrees + Equatorial.Y * Equatorial.Y);
             double parallax = 5.92 * sin(CAACoordinateTransformation::DegreesToRadians(DecLHA));
             double deltaY = Equatorial.Y*parallax/DecLHA;
@@ -190,16 +200,15 @@ void MainWindow::CalcMoon(QDate selected)
     ui->graphicsView->update();
 }
 
-
 void MainWindow::GetMoonIllumination(double JD, bool bHighPrecision, double& illuminated_fraction, double& position_angle, double& phase_angle)
 {
-  double moon_alpha = 0;
-  double moon_delta = 0;
+  double moon_alpha{0};
+  double moon_delta{0};
   GetLunarRaDecByJulian(JD, moon_alpha, moon_delta);
-  double sun_alpha = 0;
-  double sun_delta = 0;
+  double sun_alpha{0};
+  double sun_delta{0};
   GetSolarRaDecByJulian(JD, bHighPrecision, sun_alpha, sun_delta);
-  double geo_elongation = CAAMoonIlluminatedFraction::GeocentricElongation(moon_alpha, moon_delta, sun_alpha, sun_delta);
+  const double geo_elongation{CAAMoonIlluminatedFraction::GeocentricElongation(moon_alpha, moon_delta, sun_alpha, sun_delta)};
 
   position_angle = CAAMoonIlluminatedFraction::PositionAngle(sun_alpha, sun_delta, moon_alpha, moon_delta);
   phase_angle = CAAMoonIlluminatedFraction::PhaseAngle(geo_elongation, 368410.0, 149971520.0);
@@ -208,22 +217,22 @@ void MainWindow::GetMoonIllumination(double JD, bool bHighPrecision, double& ill
 
 void MainWindow::GetLunarRaDecByJulian(double JD, double& RA, double& Dec)
 {
-  double JDMoon = CAADynamicalTime::UTC2TT(JD);
-  double lambda = CAAMoon::EclipticLongitude(JDMoon);
-  double beta = CAAMoon::EclipticLatitude(JDMoon);
-  double epsilon = CAANutation::TrueObliquityOfEcliptic(JDMoon);
-  CAA2DCoordinate Lunarcoord = CAACoordinateTransformation::Ecliptic2Equatorial(lambda, beta, epsilon);
+  const double JDMoon{CAADynamicalTime::UTC2TT(JD)};
+  const double lambda{CAAMoon::EclipticLongitude(JDMoon)};
+  const double beta{CAAMoon::EclipticLatitude(JDMoon)};
+  const double epsilon{CAANutation::TrueObliquityOfEcliptic(JDMoon)};
+  CAA2DCoordinate Lunarcoord{CAACoordinateTransformation::Ecliptic2Equatorial(lambda, beta, epsilon)};
   RA = Lunarcoord.X;
   Dec = Lunarcoord.Y;
 }
 
-void MainWindow::GetSolarRaDecByJulian(double JD, bool bHighPrecision, double& RA, double& Dec)
+void  MainWindow::GetSolarRaDecByJulian(double JD, bool bHighPrecision, double& RA, double& Dec)
 {
-  double JDSun = CAADynamicalTime::UTC2TT(JD);
-  double lambda = CAASun::ApparentEclipticLongitude(JDSun, bHighPrecision);
-  double beta = CAASun::ApparentEclipticLatitude(JDSun, bHighPrecision);
-  double epsilon = CAANutation::TrueObliquityOfEcliptic(JDSun);
-  CAA2DCoordinate Solarcoord = CAACoordinateTransformation::Ecliptic2Equatorial(lambda, beta, epsilon);
+  const double JDSun{CAADynamicalTime::UTC2TT(JD)};
+  const double lambda{CAASun::ApparentEclipticLongitude(JDSun, bHighPrecision)};
+  const double beta{CAASun::ApparentEclipticLatitude(JDSun, bHighPrecision)};
+  const double epsilon{CAANutation::TrueObliquityOfEcliptic(JDSun)};
+  CAA2DCoordinate Solarcoord{CAACoordinateTransformation::Ecliptic2Equatorial(lambda, beta, epsilon)};
   RA = Solarcoord.X;
   Dec = Solarcoord.Y;
 }
